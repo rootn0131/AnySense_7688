@@ -54,8 +54,27 @@ def upload_data():
 
 def send_APRS():
 	ser=serial.Serial("/dev/ttyS0", 9600)
+
 	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
 	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
+
+	# pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
+	# values["device_id"] = Conf.DEVICE_ID
+	# values["ver_app"] = Conf.Version
+	# values["date"] = pairs[0]
+	# values["time"] = pairs[1]
+		
+	# msg = "AT+SENSOR=PM2.5:"
+	# for item in values:
+	# 	if Conf.num_re_pattern.match(str(values[item])):
+	# 		msg = msg + "|" + item + "=" + str(values[item]) + ""
+	# 	else:
+	# 		tq = values[item]
+	# 		tq = tq.replace('"','')
+	# 		msg = msg + "|" + item + "=" + tq 
+	# msg += '\n'
+	# msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n" % (values["s_d0"], values["s_t0"], values["s_h0"])
+	# ser.write(msg.encode())
 	print('serial write')
 
 def display_data(disp):
