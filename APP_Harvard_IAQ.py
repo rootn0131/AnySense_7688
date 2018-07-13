@@ -5,6 +5,8 @@ import os
 import subprocess
 import serial
 
+ser=serial.Serial("/dev/tty.SLAB_USBtoUART", 9600, timeout= 0.5 )
+
 from datetime import datetime
 
 import APP_Harvard_IAQ_config as Conf
