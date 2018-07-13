@@ -55,7 +55,6 @@ def upload_data():
 		print("Error: writing to SD")
 
 def send_APRS():
-	CSV_items = ['device_id','date','time','s_t0','s_h0','s_d0','s_d1','s_d2','s_lr','s_lg','s_lb','s_lc', 's_l0', 's_g8']
 	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
 	values["device_id"] = Conf.DEVICE_ID
 	values["ver_app"] = Conf.Version
@@ -69,12 +68,15 @@ def send_APRS():
 	except:
 		print("Error: reading /proc/uptime")
 		
-	msg = ""
-	for item in CSV_items:
-		if item in values:
-			msg = msg + str(values[item]) + '\t'
+	msg = "AT+SENSOR=PM2.5:"
+	for item in values:
+		if Conf.num_re_pattern.match(str(values[item])):
+			msg = msg + "|" + item + "=" + str(values[item]) + ""
 		else:
-			msg = msg + "N/A" + '\t'
+			tq = values[item]
+			tq = tq.replace('"','')
+			msg = msg + "|" + item + "=" + tq 
+	msg += '\n'
 	ser.write(msg.encode())
 
 def display_data(disp):
