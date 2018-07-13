@@ -5,7 +5,7 @@ import os
 import subprocess
 import serial
 
-ser=serial.Serial("/dev/tty.SLAB_USBtoUART", 9600, timeout= 0.5 )
+ser=serial.Serial("/dev/ttyS0", 9600)
 
 from datetime import datetime
 
@@ -27,7 +27,7 @@ def upload_data():
 		with open('/proc/uptime', 'r') as f:
 			values["tick"] = float(f.readline().split()[0])
 	except:
-		print "Error: reading /proc/uptime"
+		print("Error: reading /proc/uptime")
 		
 	msg = ""
 	for item in values:
@@ -52,33 +52,31 @@ def upload_data():
 		with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
 			f.write(msg + "\n")
 	except:
-		print "Error: writing to SD"
+		print("Error: writing to SD")
 
 def display_data(disp):
 	global connection_flag
 	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
 	disp.setCursor(0,0)
 	disp.write('{:16}'.format("ID: " + Conf.DEVICE_ID))
-        disp.setCursor(1,0)                                                                
-        disp.write('{:16}'.format("Date: " + pairs[0]))
+	disp.setCursor(1,0)                                                                
+	disp.write('{:16}'.format("Date: " + pairs[0]))
 	disp.setCursor(2,0)                                                                
-        disp.write('{:16}'.format("Time: " + pairs[1]))
-	disp.setCursor(3,0)                                                                                                                              
-        disp.write('{:16}'.format('Temp: %.2fF' % ((values["s_t0"]*1.8)+32)))
+	disp.write('{:16}'.format("Time: " + pairs[1]))
+	disp.setCursor(3,0)                                                                                                                   	          
+	disp.write('{:16}'.format('Temp: %.2fF' % ((values["s_t0"]*1.8)+32)))
 	disp.setCursor(4,0)                                                                
-        disp.write('{:16}'.format('  RH: %.2f%%' % values["s_h0"]))
+	disp.write('{:16}'.format('  RH: %.2f%%' % values["s_h0"]))
 	disp.setCursor(5,0)                                                                                                            
-        disp.write('{:16}'.format('PM2.5: %dug/m3' % values["s_d0"]))
+	disp.write('{:16}'.format('PM2.5: %dug/m3' % values["s_d0"]))
 	disp.setCursor(6,0)                                                                                                            
-        disp.write('{:16}'.format('Light: %dLux' % values["s_l0"]))
-
-    	disp.setCursor(7,0)
+	disp.write('{:16}'.format('Light: %dLux' % values["s_l0"]))	
+	disp.setCursor(7,0)
 	temp = '{:16}'.format(Conf.DEVICE_IP)
-	disp.write(temp)
-
+	disp.write(temp)	
 	disp.setCursor(7,15)
-    	temp = connection_flag
-    	disp.write(temp)
+	temp = connection_flag
+	disp.write(temp)
 	
 def reboot_system():
 	process = subprocess.Popen(['uptime'], stdout = subprocess.PIPE)
@@ -151,38 +149,38 @@ if __name__ == '__main__':
 		if Conf.Sense_Tmp==1 and not Conf.tmp_q.empty():
 			while not Conf.tmp_q.empty():
 				tmp_data = Conf.tmp_q.get()
-                        for item in tmp_data:                                                                 
-                                if item in fields:                                                                
-                                        values[fields[item]] = tmp_data[item]                                     
+			for item in tmp_data:                                                                 
+				if item in fields:                                                                
+					values[fields[item]] = tmp_data[item]                                     
 					if Conf.float_re_pattern.match(str(values[fields[item]])):
 						values[fields[item]] = round(float(values[fields[item]]),2)
-                                else:                                                                             
+				else:                                                                             
                                         values[item] = tmp_data[item]
 		if Conf.Sense_Light==1 and not Conf.light_q.empty():
 			while not Conf.light_q.empty(): 
 				light_data = Conf.light_q.get()
-                        for item in light_data:                                                                 
-                                if item in fields:                                                                
-                                        values[fields[item]] = light_data[item]                                     
+			for item in light_data:                                                                 
+				if item in fields:                                                                
+					values[fields[item]] = light_data[item]                                     
 					if Conf.float_re_pattern.match(str(values[fields[item]])):
 						values[fields[item]] = round(float(values[fields[item]]),2)
-                                else:                                                                             
+				else:                                                                             
                                         values[item] = light_data[item]                                             
 		if Conf.Sense_Gas==1 and not Conf.gas_q.empty():
 			while not Conf.gas_q.empty():
 				gas_data = Conf.gas_q.get()
-                        for item in gas_data:                                                                 
-                                if item in fields:                                                                
-                                        values[fields[item]] = gas_data[item]                                     
+			for item in gas_data:                                                                 
+				if item in fields:                                                                
+					values[fields[item]] = gas_data[item]                                     
 					if Conf.float_re_pattern.match(str(values[fields[item]])):
 						values[fields[item]] = round(float(values[fields[item]]),2)
-                                else:                                                                             
+				else:                                                                             
                                         values[item] = gas_data[item]                                             
 		display_data(disp)
 		if count == 0:
-			upload_data()
-			msg = "AT+SENSOR=PM2.5:n%d\n"
-			ser.write((msg % (values["s_d0"])).encode())
+			# upload_data()
+			msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
+			ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
 			print('serial write')
 			
 		count = count + 1
