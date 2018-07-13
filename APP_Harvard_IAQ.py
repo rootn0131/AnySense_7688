@@ -54,6 +54,29 @@ def upload_data():
 	except:
 		print("Error: writing to SD")
 
+def send_APRS():
+	CSV_items = ['device_id','date','time','s_t0','s_h0','s_d0','s_d1','s_d2','s_lr','s_lg','s_lb','s_lc', 's_l0', 's_g8']
+	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
+	values["device_id"] = Conf.DEVICE_ID
+	values["ver_app"] = Conf.Version
+	values["date"] = pairs[0]
+	values["time"] = pairs[1]
+	
+	values["tick"] = 0
+	try:
+		with open('/proc/uptime', 'r') as f:
+			values["tick"] = float(f.readline().split()[0])
+	except:
+		print("Error: reading /proc/uptime")
+		
+	msg = ""
+	for item in CSV_items:
+		if item in values:
+			msg = msg + str(values[item]) + '\t'
+		else:
+			msg = msg + "N/A" + '\t'
+	ser.write(msg.encode())
+
 def display_data(disp):
 	global connection_flag
 	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
@@ -179,8 +202,8 @@ if __name__ == '__main__':
 		display_data(disp)
 		if count == 0:
 			# upload_data()
-			msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
-			ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
+			send_APRS()
+			
 			print('serial write')
 			
 		count = count + 1
