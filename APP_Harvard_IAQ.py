@@ -54,31 +54,6 @@ def upload_data():
 	except:
 		print("Error: writing to SD")
 
-def send_APRS():
-	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
-	values["device_id"] = Conf.DEVICE_ID
-	values["ver_app"] = Conf.Version
-	values["date"] = pairs[0]
-	values["time"] = pairs[1]
-	
-	values["tick"] = 0
-	try:
-		with open('/proc/uptime', 'r') as f:
-			values["tick"] = float(f.readline().split()[0])
-	except:
-		print("Error: reading /proc/uptime")
-		
-	msg = "AT+SENSOR=PM2.5:"
-	for item in values:
-		if Conf.num_re_pattern.match(str(values[item])):
-			msg = msg + "|" + item + "=" + str(values[item]) + ""
-		else:
-			tq = values[item]
-			tq = tq.replace('"','')
-			msg = msg + "|" + item + "=" + tq 
-	msg += '\n'
-	ser.write(msg.encode())
-
 def display_data(disp):
 	global connection_flag
 	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
@@ -204,8 +179,8 @@ if __name__ == '__main__':
 		display_data(disp)
 		if count == 0:
 			# upload_data()
-			send_APRS()
-			
+			msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
+			ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
 			print('serial write')
 			
 		count = count + 1
