@@ -3,6 +3,7 @@ import time
 import string
 import os
 import subprocess
+import serial
 
 from datetime import datetime
 
@@ -178,6 +179,9 @@ if __name__ == '__main__':
 		display_data(disp)
 		if count == 0:
 			upload_data()
+			msg = "AT+SENSOR=PM2.5:n%d\n"
+			ser.write((msg % (values["s_d0"])).encode())
+			print('serial write')
 			
 		count = count + 1
 		count = count % (Conf.Restful_interval / Conf.Interval_LCD)
