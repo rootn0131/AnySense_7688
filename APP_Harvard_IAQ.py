@@ -5,8 +5,6 @@ import os
 import subprocess
 import serial
 
-ser=serial.Serial("/dev/ttyS0", 9600)
-
 from datetime import datetime
 
 import APP_Harvard_IAQ_config as Conf
@@ -53,6 +51,12 @@ def upload_data():
 			f.write(msg + "\n")
 	except:
 		print("Error: writing to SD")
+
+def send_APRS():
+	ser=serial.Serial("/dev/ttyS0", 9600)
+	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
+	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
+	print('serial write')
 
 def display_data(disp):
 	global connection_flag
@@ -179,9 +183,8 @@ if __name__ == '__main__':
 		display_data(disp)
 		if count == 0:
 			# upload_data()
-			msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
-			ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
-			print('serial write')
+			send_APRS()
+			
 			
 		count = count + 1
 		count = count % (Conf.Restful_interval / Conf.Interval_LCD)
