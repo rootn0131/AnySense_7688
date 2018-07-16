@@ -14,4 +14,3 @@ python /root/AnySense_7688/AnySense_RTC.py -d 0 -k $1
 crontab /root/AnySense_7688/APP/Harvard_IAQ/RTC_cron
 
 reboot
-

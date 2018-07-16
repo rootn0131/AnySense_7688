@@ -5,8 +5,6 @@ import os
 import subprocess
 import serial
 
-ser=serial.Serial("/dev/ttyS0", 9600)
-
 from datetime import datetime
 
 import APP_Harvard_IAQ_config as Conf
@@ -55,10 +53,12 @@ def upload_data():
 		print("Error: writing to SD")
 
 def send_APRS():
-	while ser.inWaiting():
-		print(ser.readline())
-	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n"
+	ser=serial.Serial("/dev/ttyS0", 9600, timeout=5)
+	print('prepare for APRS')
+	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\r\n"
 	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
+	print(ser.in_waiting)
+	ser.close()
 
 	# pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
 	# values["device_id"] = Conf.DEVICE_ID
@@ -77,7 +77,6 @@ def send_APRS():
 	# msg += '\n'
 	# msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n" % (values["s_d0"], values["s_t0"], values["s_h0"])
 	# ser.write(msg.encode())
-	print('serial write')
 
 def display_data(disp):
 	global connection_flag
