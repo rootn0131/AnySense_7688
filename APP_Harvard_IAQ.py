@@ -12,71 +12,23 @@ import APP_Harvard_IAQ_config as Conf
 fields = Conf.fields
 values = Conf.values
 
-def upload_data():
-	CSV_items = ['device_id','date','time','s_t0','s_h0','s_d0','s_d1','s_d2','s_lr','s_lg','s_lb','s_lc', 's_l0', 's_g8']
-	pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
-	values["device_id"] = Conf.DEVICE_ID
-	values["ver_app"] = Conf.Version
-	values["date"] = pairs[0]
-	values["time"] = pairs[1]
-	
-	values["tick"] = 0
-	try:
-		with open('/proc/uptime', 'r') as f:
-			values["tick"] = float(f.readline().split()[0])
-	except:
-		print("Error: reading /proc/uptime")
-		
-	msg = ""
-	for item in values:
-		if Conf.num_re_pattern.match(str(values[item])):
-			msg = msg + "|" + item + "=" + str(values[item]) + ""
-		else:
-			tq = values[item]
-			tq = tq.replace('"','')
-			msg = msg + "|" + item + "=" + tq 
+def send_APRS():
+	ser=serial.Serial("/dev/ttyS0", 9600, timeout=5)
+	print('prepare for APRS')
 
-	restful_str = "wget -O /tmp/last_upload.log \"" + Conf.Restful_URL + "topic=" + Conf.APP_ID + "&device_id=" + Conf.DEVICE_ID + "&key=" + Conf.SecureKey + "&msg=" + msg + "\""
-	os.system(restful_str)
+	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\r\n"
+	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
+	print(ser.in_waiting)
+	ser.write(msg.encode())
 
-	msg = ""
-	for item in CSV_items:
-		if item in values:
-			msg = msg + str(values[item]) + '\t'
-		else:
-			msg = msg + "N/A" + '\t'
-	
+	ser.close()
+
+	# write to SD card
 	try:
 		with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
 			f.write(msg + "\n")
 	except:
 		print("Error: writing to SD")
-
-def send_APRS():
-	ser=serial.Serial("/dev/ttyS0", 9600, timeout=5)
-	print('prepare for APRS')
-	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\r\n"
-	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
-	print(ser.in_waiting)
-	ser.close()
-
-	# pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
-	# values["device_id"] = Conf.DEVICE_ID
-	# values["ver_app"] = Conf.Version
-	# values["date"] = pairs[0]
-	# values["time"] = pairs[1]
-		
-	# msg = "AT+SENSOR=PM2.5:"
-	# for item in values:
-	# 	if Conf.num_re_pattern.match(str(values[item])):
-	# 		msg = msg + "|" + item + "=" + str(values[item]) + ""
-	# 	else:
-	# 		tq = values[item]
-	# 		tq = tq.replace('"','')
-	# 		msg = msg + "|" + item + "=" + tq 
-	# msg += '\n'
-	# msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\n" % (values["s_d0"], values["s_t0"], values["s_h0"])
-	# ser.write(msg.encode())
 
 def display_data(disp):
 	global connection_flag
