@@ -109,8 +109,10 @@ if __name__ == '__main__':
 	values["s_l0"] = -1
 	values["s_g8"] = 0
 	while True:
-		reboot_system()
-		check_connection()
+		# reboot_system()
+		# check_connection()
+		global connection_flag
+		connection_flag = 'x'
 
 		if Conf.Sense_PM==1 and not Conf.pm_q.empty():
 			while not Conf.pm_q.empty():
