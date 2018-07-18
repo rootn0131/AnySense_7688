@@ -24,11 +24,11 @@ def send_APRS():
 	ser.close()
 
 	# write to SD card
-	try:
-		with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
-			f.write(msg + "\n")
-	except:
-		print("Error: writing to SD")
+	# try:
+	# 	with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
+	# 		f.write(msg + "\n")
+	# except:
+	# 	print("Error: writing to SD")
 
 def display_data(disp):
 	global connection_flag
