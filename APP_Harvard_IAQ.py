@@ -15,7 +15,7 @@ values = Conf.values
 def send_APRS():
 	ser=serial.Serial("/dev/ttyS0", 9600)
 
-	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f-ID%s\r\n" % (values["s_d0"], values["s_t0"], values["s_h0"], Conf.DEVICE_ID)
+	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f-ID%s-Time%d\r\n" % (values["s_d0"], values["s_t0"], values["s_h0"], Conf.DEVICE_ID, int(time.time()))
 	ser.write(msg.encode())
 	ser.close()
 
