@@ -8,20 +8,29 @@ start()
 {
 
 	sleep 30
-        [ -f /root/AnySense_7688/APP_Harvard_IAQ.py ] && {
-		/usr/bin/git -C /root/AnySense_7688 fetch origin
-		/usr/bin/git -C /root/AnySense_7688 reset --hard origin/master
+	ping -c1 -q 8.8.8.8
+	status=$?;
+	if [ $status == '0' ]
+	then
+		[ -f /root/AnySense_7688/APP_Harvard_IAQ.py ] && {
+			/usr/bin/git -C /root/AnySense_7688 fetch origin
+			/usr/bin/git -C /root/AnySense_7688 reset --hard origin/master
+			/usr/bin/python /root/AnySense_7688/AnySense_RTC.py &>/dev/null
+			# /usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py &>/dev/null
+			rm /root/AnySense_7688/out.txt
+			/usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py > /root/AnySense_7688/out.txt
+		} || {
+			/usr/bin/git clone https://github.com/rootn0131/AnySense_7688/ /root/AnySense_7688
+			/usr/bin/python /root/AnySense_7688/AnySense_RTC.py &>/dev/null
+			# /usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py &>/dev/null
+			rm /root/AnySense_7688/out.txt
+			/usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py > /root/AnySense_7688/out.txt
+		}
+	else
 		/usr/bin/python /root/AnySense_7688/AnySense_RTC.py &>/dev/null
-		# /usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py &>/dev/null
 		rm /root/AnySense_7688/out.txt
 		/usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py > /root/AnySense_7688/out.txt
-        } || {
-                /usr/bin/git clone https://github.com/rootn0131/AnySense_7688/ /root/AnySense_7688
-		/usr/bin/python /root/AnySense_7688/AnySense_RTC.py &>/dev/null
-		# /usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py &>/dev/null
-		rm /root/AnySense_7688/out.txt
-		/usr/bin/python /root/AnySense_7688/APP_Harvard_IAQ.py > /root/AnySense_7688/out.txt
-        }
+	fi
 
 
 }
