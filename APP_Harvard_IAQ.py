@@ -13,8 +13,7 @@ fields = Conf.fields
 values = Conf.values
 
 def send_APRS():
-	ser=serial.Serial("/dev/ttyS0", 9600, timeout=5)
-	print('prepare for APRS')
+	ser=serial.Serial("/dev/ttyS0", 9600)
 
 	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f\r\n"
 	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
@@ -24,11 +23,11 @@ def send_APRS():
 	ser.close()
 
 	# write to SD card
-	# try:
-	# 	with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
-	# 		f.write(msg + "\n")
-	# except:
-	# 	print("Error: writing to SD")
+	try:
+		with open(Conf.FS_SD + "/" + values["date"] + ".txt", "a") as f:
+			f.write(msg + "\n")
+	except:
+		print("Error: writing to SD")
 
 def display_data(disp):
 	global connection_flag
@@ -156,7 +155,6 @@ if __name__ == '__main__':
                                         values[item] = gas_data[item]                                             
 		display_data(disp)
 		if count == 0:
-			# upload_data()
 			send_APRS()
 			
 			
