@@ -15,11 +15,8 @@ values = Conf.values
 def send_APRS():
 	ser=serial.Serial("/dev/ttyS0", 9600)
 
-	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f\r\n"
-	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
-	print(ser.in_waiting)
+	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f-ID%s\r\n" % (values["s_d0"], values["s_t0"], values["s_h0"], Conf.DEVICE_ID)
 	ser.write(msg.encode())
-
 	ser.close()
 
 	# write to SD card
