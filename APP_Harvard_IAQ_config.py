@@ -26,6 +26,8 @@ Interval_LCD = 5
 Restful_URL = "https://data.lass-net.org/Upload/MAPS-secure.php?"
 Restful_interval = 30			# 60 seconds
 
+APRS_interval = 90
+
 SecureKey = "NoKey"
 
 FS_SD = "/mnt/mmcblk0p1"

@@ -16,7 +16,7 @@ def send_APRS():
 	ser=serial.Serial("/dev/ttyS0", 9600, timeout=5)
 	print('prepare for APRS')
 
-	msg = "AT+SENSOR=PM2.5:%d-Temp%.2f-RH%.2f\r\n"
+	msg = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f\r\n"
 	ser.write((msg % (values["s_d0"], values["s_t0"], values["s_h0"])).encode())
 	print(ser.in_waiting)
 	ser.write(msg.encode())
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 			
 			
 		count = count + 1
-		count = count % (Conf.Restful_interval / Conf.Interval_LCD)
+		count = count % (Conf.APRS_interval / Conf.Interval_LCD)
 		time.sleep(Conf.Interval_LCD)
 		
 
