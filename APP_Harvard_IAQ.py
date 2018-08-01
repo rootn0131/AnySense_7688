@@ -13,7 +13,7 @@ fields = Conf.fields
 values = Conf.values
 
 def send_APRS():
-	ser=serial.Serial("/dev/ttyS0", 9600)
+	ser=serial.Serial("/dev/ttyS0", 9600, timeout = 2)
 
 	sense = "AT+SENSOR=PM2.5%d-Temp%.2f-RH%.2f-" % (values["s_d0"], values["s_t0"], values["s_h0"])
 	info = "ID%s-Time%d\r\n" % (Conf.DEVICE_ID, int(time.time()))
@@ -39,7 +39,7 @@ def display_data(disp):
 	disp.setCursor(2,0)                                                                
 	disp.write('{:16}'.format("Time: " + pairs[1]))
 	disp.setCursor(3,0)                                                                                                                   	          
-	disp.write('{:16}'.format('Temp: %.2fF' % ((values["s_t0"]*1.8)+32)))
+	disp.write('{:16}'.format('Temp: %.2fC' % ((values["s_t0"]))))
 	disp.setCursor(4,0)                                                                
 	disp.write('{:16}'.format('  RH: %.2f%%' % values["s_h0"]))
 	disp.setCursor(5,0)                                                                                                            
